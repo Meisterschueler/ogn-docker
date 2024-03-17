@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  ogn-rf:
+    image: ogn-rf
+    container_name: ogn-rf
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    expose:
+      - 50010
+    volumes:
+      - ./Template.conf:/etc/rtlsdr-ogn.conf
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    networks:
+      - ogn
+
+  ogn-decode:
+    image: ogn-decode
+    container_name: ogn-decode
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    volumes:
+      - ./Template.conf:/etc/rtlsdr-ogn.conf
+    networks:
+      - ogn
+
+  ogn-filter:
+    image: ogn-filter
+    container_name: ogn-filter
+    restart: unless-stopped
+    expose:
+      - 14580
+    networks:
+      - ogn
+
+networks:
+  ogn:
+    driver: bridge

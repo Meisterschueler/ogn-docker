@@ -1,0 +1,29 @@
+# Create the builder image
+FROM debian:bookworm as builder
+
+COPY ./scripts /scripts
+RUN chmod +x /scripts/*
+
+# Install all the tools we need
+RUN apt update && \
+    apt upgrade && \
+    apt install -y wget
+
+# Get the OGN binaries
+RUN /scripts/get_ogn_software.sh
+
+
+# Create the final slim image
+FROM debian:bookworm-slim
+
+# Install all the tools we need
+RUN apt update && \
+    apt upgrade && \
+    apt install -y libpng16-16
+
+# Copy the ogn-decode from above
+COPY --from=builder /rtlsdr-ogn/ogn-decode /bin/ogn-decode
+
+ENTRYPOINT ["/bin/ogn-decode", "/etc/rtlsdr-ogn.conf"]
+
+EXPOSE 8081

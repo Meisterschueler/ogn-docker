@@ -1,0 +1,9 @@
+FROM python:alpine
+
+COPY ./scripts /scripts
+RUN chmod +x /scripts/*
+
+RUN pip install aprslib requests
+
+ENTRYPOINT ["python", "/scripts/privacyFilter.py"]
+

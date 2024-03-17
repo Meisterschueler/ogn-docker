@@ -1,0 +1,51 @@
+# Create the builder image
+FROM debian:bookworm as builder
+
+COPY ./scripts /scripts
+RUN chmod +x /scripts
+
+# Get all the tools we need
+RUN apt update && \
+    apt upgrade && \
+    apt install -y git cmake libusb-1.0-0-dev wget
+
+# Get the OGN binaries
+RUN scripts/get_ogn_software.sh
+
+# Compile librtlsdr with software bias tee for "silver dongle v3"
+RUN git clone https://github.com/rtlsdrblog/rtl-sdr && \
+    cd rtl-sdr && \
+    mkdir build && \
+    cd build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DINSTALL_UDEV_RULES=ON -DDETACH_KERNEL_DRIVER=ON && \
+    make && \
+    make install && \
+    cd .. && \
+    cd ..
+
+
+# Create the final slim image
+FROM debian:bookworm-slim
+
+# Get all the tools we need
+RUN apt update && \
+    apt upgrade && \
+    apt install -y libpng16-16 libusb-1.0-0-dev
+
+# Copy the librtlsdr from above
+COPY --from=builder /etc/udev/rules.d/rtl-sdr.rules /etc/udev/rules.d/rtl-sdr.rules
+COPY --from=builder /usr/lib/pkgconfig/librtlsdr.pc /usr/lib/pkgconfig/librtlsdr.pc
+COPY --from=builder /usr/include/rtl-sdr* /usr/include/
+COPY --from=builder /usr/lib/librtlsdr.so.0.5git /usr/lib/librtlsdr.a /usr/lib/
+COPY --from=builder /usr/bin/rtl_* /usr/bin/
+
+RUN ln -s /usr/lib/librtlsdr.so.0.5git /usr/lib/librtlsdr.so.0 && \
+    ln -s /usr/lib/librtlsdr.so.0 /usr/lib/librtlsdr.so && \
+    ldconfig
+
+# Copy the ogn-rf from above
+COPY --from=builder /rtlsdr-ogn/ogn-rf /bin/ogn-rf
+
+ENTRYPOINT ["/bin/ogn-rf", "/etc/rtlsdr-ogn.conf"]
+
+EXPOSE 8080 50010
