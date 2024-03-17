@@ -1,0 +1,39 @@
+# Create the builder image
+FROM debian:bookworm as builder
+WORKDIR /build
+
+# Get all the tools we need
+RUN apt update && \
+    apt install -y wget
+
+# Get the GeoidSepar file
+RUN wget --no-check-certificate https://earth-info.nga.mil/GandG/wgs84/gravitymod/egm96/binary/WW15MGH.DAC
+
+# Copy the scripts
+COPY ./scripts ./scripts
+RUN chmod +x ./scripts/*
+
+# Get the OGN binaries
+RUN ./scripts/get_ogn_software.sh
+
+
+# Create the final slim image
+FROM debian:bookworm-slim
+WORKDIR /rtlsdr-ogn
+
+# Get all the tools we need
+RUN apt update && \
+    apt install -y libpng16-16 && \
+    apt autoremove && \
+    apt autoclean
+
+# Copy the ogn-decode binary from above
+COPY --from=builder /build/rtlsdr-ogn/ogn-decode .
+
+# Copy the GeoidSepar file from above
+COPY --from=builder /build/WW15MGH.DAC .
+
+ENTRYPOINT ["./ogn-decode"]
+
+VOLUME /rtlsdr-ogn/rtlsdr-ogn.conf
+EXPOSE 8081

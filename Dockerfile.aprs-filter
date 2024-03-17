@@ -1,0 +1,15 @@
+# Create the final image
+FROM python:alpine
+WORKDIR /scripts
+
+# Get all the tools we need
+RUN apk update && \
+    apk add socat
+
+# Copy the ogn-decode binary from above
+COPY ./scripts/ .
+
+ENTRYPOINT ["socat"]
+CMD ["TCP-LISTEN:14580,fork,reuseaddr", "SYSTEM:'python outgoing.py | socat - \"TCP:aprs.glidernet.org:14580\" | python incoming.py'"]
+
+EXPOSE 14580

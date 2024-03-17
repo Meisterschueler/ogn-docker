@@ -1,0 +1,61 @@
+# Create the builder image
+FROM debian:bookworm as builder
+WORKDIR /build
+
+# Install the tools we need for rtl-sdr to compile
+RUN apt update && \
+    apt install -y git cmake pkg-config debhelper dpkg-dev libusb-1.0-0-dev libconfig-dev
+
+# Generate rtl-sdr package with modifications for "silver dongle" v3 and v4
+RUN git clone https://github.com/rtlsdrblog/rtl-sdr-blog --branch master --depth 1 --single-branch && \
+    cd rtl-sdr-blog && \
+    dpkg-buildpackage -b --no-sign && \
+    cd .. && \
+    dpkg -i librtlsdr0_*.deb && \
+    dpkg -i librtlsdr-dev_*.deb && \
+    dpkg -i rtl-sdr_*.deb
+
+# Install the tools we additionally need for ogn-rf to compile
+RUN apt install -y g++ libfftw3-dev libjpeg-dev
+
+# Compile ogn-rf
+RUN git clone https://github.com/glidernet/ogn-rf --branch master --depth 1 --single-branch && \
+    cd ogn-rf && \
+    make && \
+    cd ..
+
+# Workaround #1 - get the precompiled binaries
+COPY ./scripts/get_ogn_software.sh .
+RUN apt install -y wget && \
+    chmod +x ./get_ogn_software.sh && \
+    ./get_ogn_software.sh
+
+
+# Create the final slim image
+FROM debian:bookworm-slim
+WORKDIR /rtlsdr-ogn
+
+# Install libraries that rtl-sdr and ogn-rf need to run
+RUN apt update && \
+    apt install -y libusb-1.0-0 libjpeg62 libconfig9 libfftw3-bin
+
+# Install the modified rtl-sdr library from above
+COPY --from=builder /build/librtlsdr0_*.deb .
+COPY --from=builder /build/rtl-sdr_*.deb .
+RUN dpkg -i librtlsdr0_*.deb && \
+    dpkg -i rtl-sdr_*.deb && \
+    rm *.deb
+
+# Copy the ogn-rf binaries from above
+COPY --from=builder /build/ogn-rf/gsm_scan .
+COPY --from=builder /build/ogn-rf/ogn-rf .
+COPY --from=builder /build/ogn-rf/r2fft_test .
+
+# Workaround #2 - overwrite compiled binary with the precompiled binary from above
+RUN apt install -y libpng16-16
+COPY --from=builder /build/rtlsdr-ogn/ogn-rf .
+
+ENTRYPOINT ["./ogn-rf"]
+
+VOLUME /rtlsdr-ogn/rtlsdr-ogn.conf
+EXPOSE 8080 50010
