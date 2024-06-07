@@ -19,16 +19,10 @@ RUN git clone https://github.com/rtlsdrblog/rtl-sdr-blog --branch master --depth
 RUN apt install -y g++ libfftw3-dev libjpeg-dev
 
 # Compile ogn-rf
-RUN git clone https://github.com/glidernet/ogn-rf --branch master --depth 1 --single-branch && \
-    cd ogn-rf && \
-    make && \
+RUN git clone https://github.com/pjalocha/ogn-rf-soapysdr --branch master --depth 1 --single-branch && \
+    cd ogn-rf-soapysdr && \
+    make ogn-rf || true && \
     cd ..
-
-# Workaround #1 - get the precompiled binaries
-COPY ./scripts/get_ogn_software.sh .
-RUN apt install -y wget && \
-    chmod +x ./get_ogn_software.sh && \
-    ./get_ogn_software.sh
 
 
 # Create the final slim image
@@ -47,13 +41,7 @@ RUN dpkg -i librtlsdr0_*.deb && \
     rm *.deb
 
 # Copy the ogn-rf binaries from above
-COPY --from=builder /build/ogn-rf/gsm_scan .
-COPY --from=builder /build/ogn-rf/ogn-rf .
-COPY --from=builder /build/ogn-rf/r2fft_test .
-
-# Workaround #2 - overwrite compiled binary with the precompiled binary from above
-RUN apt install -y libpng16-16
-COPY --from=builder /build/rtlsdr-ogn/ogn-rf .
+COPY --from=builder /build/ogn-rf-soapysdr/ogn-rf .
 
 ENTRYPOINT ["./ogn-rf"]
 
