@@ -29,7 +29,7 @@ elif [ "$ARCH" = "i386" ]; then
 elif [ "$ARCH" = "amd64" ]; then
 	URL=http://download.glidernet.org/x64/rtlsdr-ogn-bin-x64-latest.tgz
 elif [ "$ARCH" = "armhf" ]; then
-	URL=http://download.glidernet.org/ARM/rtlsdr-ogn-bin-ARM-latest.tgz
+	URL=http://download.glidernet.org/arm/rtlsdr-ogn-bin-ARM-latest.tgz
 else
 	echo "Architecture '$ARCH' is unknown..."
 	exit 1
