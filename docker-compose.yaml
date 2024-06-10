@@ -1,14 +1,27 @@
 services:
+  ogn-configuration:
+    image: ogn-configuration
+    container_name: ogn-configuration
+    restart: on-failure
+    env_file:
+      - .env
+    volumes:
+      - shared_data:/shared_data
+
   ogn-rf:
     image: ogn-rf
     container_name: ogn-rf
     restart: unless-stopped
+    depends_on:
+      ogn-configuration:
+        condition: service_healthy
     ports:
       - 8080:8080
     expose:
       - 50010
     volumes:
-      - ./rtlsdr-ogn.conf:/rtlsdr-ogn/rtlsdr-ogn.conf
+      - shared_data:/shared_data
+    command: /shared_data/rtlsdr-ogn.conf
     devices:
       - /dev/bus/usb:/dev/bus/usb
     networks:
@@ -20,10 +33,14 @@ services:
     image: ogn-decode
     container_name: ogn-decode
     restart: unless-stopped
+    depends_on:
+      ogn-configuration:
+        condition: service_healthy
     ports:
       - 8081:8081
     volumes:
-      - ./rtlsdr-ogn.conf:/rtlsdr-ogn/rtlsdr-ogn.conf
+      - shared_data:/shared_data
+    command: /shared_data/rtlsdr-ogn.conf
     networks:
       - receiver
     tty: true
@@ -33,6 +50,9 @@ services:
     image: aprs-filter
     container_name: aprs-filter
     restart: unless-stopped
+    depends_on:
+      ogn-configuration:
+        condition: service_healthy
     expose:
       - 14580
     networks:
@@ -41,3 +61,6 @@ services:
 networks:
   receiver:
     driver: bridge
+
+volumes:
+  shared_data:

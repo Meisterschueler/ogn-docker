@@ -12,10 +12,10 @@ if [ "$HW" = "BCM2835" ]; then
 	REV=$(cat /proc/cpuinfo | grep 'Revision' | awk '{print $3}')
 	PPPP=$(echo "$(( ( 0x$REV >> 12 ) & 0xF ))")
 
-	# Support for GPU_FFT is dropped with bookworm (debian 12)
+	# Support for GPU_FFT is dropped with bullseye (debian 11)
 	VERSION_ID=$(lsb_release -a | grep 'Release:' | awk '{print $2}')
 
-	if [ "$PPPP" -le 2 ] && [ "$VERSION_ID" -l 12 ]; then
+	if [ "$PPPP" -le 2 ] && [ "$VERSION_ID" -l 11 ]; then
 		URL=http://download.glidernet.org/rpi-gpu/rtlsdr-ogn-bin-RPI-GPU-latest.tgz
 	elif [ "$ARCH" = "arm64" ]; then
 		URL=http://download.glidernet.org/arm64/rtlsdr-ogn-bin-arm64-latest.tgz

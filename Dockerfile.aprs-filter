@@ -6,8 +6,9 @@ WORKDIR /scripts
 RUN apk update && \
     apk add socat
 
-# Copy the ogn-decode binary from above
-COPY ./scripts/ .
+# Copy the filter scripts
+COPY ./scripts/incoming.py .
+COPY ./scripts/outgoing.py .
 
 ENTRYPOINT ["socat"]
 CMD ["TCP-LISTEN:14580,fork,reuseaddr", "SYSTEM:'python outgoing.py | socat - \"TCP:aprs.glidernet.org:14580\" | python incoming.py'"]

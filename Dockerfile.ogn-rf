@@ -40,7 +40,7 @@ RUN dpkg -i librtlsdr0_*.deb && \
     dpkg -i rtl-sdr_*.deb && \
     rm *.deb
 
-# Copy the ogn-rf binaries from above
+# Copy the ogn-rf binary from above
 COPY --from=builder /build/ogn-rf-soapysdr/ogn-rf .
 
 ENTRYPOINT ["./ogn-rf"]
