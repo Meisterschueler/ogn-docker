@@ -31,7 +31,8 @@ WORKDIR /rtlsdr-ogn
 
 # Install libraries that rtl-sdr and ogn-rf need to run
 RUN apt update && \
-    apt install -y libusb-1.0-0 libjpeg62 libconfig9 libfftw3-bin
+    apt install -y libusb-1.0-0 libjpeg62 libconfig9 libfftw3-bin && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install the modified rtl-sdr library from above
 COPY --from=builder /build/librtlsdr0_*.deb .

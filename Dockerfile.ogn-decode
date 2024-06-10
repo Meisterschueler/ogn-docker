@@ -22,8 +22,7 @@ WORKDIR /rtlsdr-ogn
 # Get all the tools we need
 RUN apt update && \
     apt install -y libpng16-16 && \
-    apt autoremove && \
-    apt autoclean
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the ogn-decode binary from above
 COPY --from=builder /build/rtlsdr-ogn/ogn-decode .
