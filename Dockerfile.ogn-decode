@@ -1,5 +1,5 @@
 # Create the builder image
-FROM debian:bookworm as builder
+FROM debian:bookworm AS builder
 WORKDIR /build
 
 # Get all the tools we need
