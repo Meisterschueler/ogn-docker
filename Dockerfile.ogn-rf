@@ -16,7 +16,7 @@ RUN git clone https://github.com/rtlsdrblog/rtl-sdr-blog --branch master --depth
     dpkg -i rtl-sdr_*.deb
 
 # Install the tools we additionally need for ogn-rf to compile
-RUN apt install -y g++ libfftw3-dev libjpeg-dev
+RUN apt install -y g++ libfftw3-dev libjpeg-dev libpng-dev
 
 # Compile ogn-rf
 RUN git clone https://github.com/pjalocha/ogn-rf-soapysdr --branch master --depth 1 --single-branch && \
@@ -31,7 +31,7 @@ WORKDIR /rtlsdr-ogn
 
 # Install libraries that rtl-sdr and ogn-rf need to run
 RUN apt update && \
-    apt install -y libusb-1.0-0 libjpeg62 libconfig9 libfftw3-bin && \
+    apt install -y libusb-1.0-0 libjpeg62 libconfig9 libfftw3-bin libpng16-16 && \
     rm -rf /var/lib/apt/lists/*
 
 # Install the modified rtl-sdr library from above
