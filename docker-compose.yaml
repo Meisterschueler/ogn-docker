@@ -5,6 +5,8 @@ services:
     restart: on-failure
     env_file:
       - .env
+    environment:
+      Demodulator_PipeName: ogn-rf:50010
     volumes:
       - shared_data:/shared_data
 
