@@ -7,12 +7,9 @@ RUN pip install libconf python-dotenv
 
 # Copy the converter script
 COPY ./scripts/env2conf.py .
-
-# Keep the container alive
-CMD ["sleep", "infinity"]
-
-# Container is healthy if it successfully converted the env variables to OGN configuration
 RUN mkdir /shared_data
-HEALTHCHECK --interval=5s --timeout=1s CMD python env2conf.py > /shared_data/rtlsdr-ogn.conf
+
+# Convert the env variables to OGN configuration
+CMD ["sh", "-c", "python /scripts/env2conf.py > /shared_data/rtlsdr-ogn.conf && echo 'Successfully generated OGN configuration file in /shared_data/rtlsdr-ogn.conf' && sleep infinity"]
 
 VOLUME /shared_data

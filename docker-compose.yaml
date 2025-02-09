@@ -2,13 +2,19 @@ services:
   ogn-configuration:
     image: ogn-configuration
     container_name: ogn-configuration
-    restart: on-failure
+    restart: no
     env_file:
       - .env
     environment:
       Demodulator_PipeName: ogn-rf:50010
     volumes:
       - shared_data:/shared_data
+    healthcheck:
+      test: ["CMD", "test", "-s", "/shared_data/rtlsdr-ogn.conf"]
+      start_period: 1s
+      timeout: 1s
+      interval: 1s
+      retries: 1
 
   ogn-rf:
     image: ogn-rf
