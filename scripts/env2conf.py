@@ -47,7 +47,7 @@ def is_numeric(value):
 def validate_mandatory_parameters(parameters: Dict[str, Any]) -> None:
     """Check if mandatory parameter APRS_Call, and Position_xxx are correctly set."""
 
-    aprs_call_regex = re.compile(r"^[A-Za-z][A-Za-z0-9]{2,7}$")
+    aprs_call_regex = re.compile(r"^[A-Za-z][A-Za-z0-9]{2,8}$")
     try:
         if "APRS_Call" not in parameters or not parameters['APRS_Call']:
             raise ValueError("Setting 'APRS_Call' missing or empty.")
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     if args.file:
         file_path = os.path.abspath(args.file)
         if not os.path.exists(file_path):
-            print(f"Error: file '{args.file}' does not exist")
+            print(f"Error: file '{args.file}' does not exist", file=sys.stderr)
             sys.exit(1)
 
         # Read parameters from .env file and print out like .conf
