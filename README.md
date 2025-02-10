@@ -3,7 +3,8 @@
 ## Features
 - [x] OGN configuration with environment variables instead of libconfig files
 - [x] ogn-rf and ogn-decode do not start if configuration is invalid or incomplete
-- [x] multiarch (linux/arm/v7, linux/arm64, linux/amd64) images available for all docker containers
+- [x] aprs-proxy for the outgoing and incoming aprs traffic, filter scripts are written in Python
+- [x] multiarch (linux/arm/v7, linux/arm64, linux/amd64) images available for all docker containers: [dockerhub](https://hub.docker.com/u/kammermark)
 
 ## Installation
 ### Configuration
