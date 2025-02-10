@@ -7,6 +7,7 @@ services:
       - .env
     environment:
       Demodulator_PipeName: ogn-rf:50010
+      APRS_Server: "aprs-filter:14580"
     volumes:
       - shared_data:/shared_data
     healthcheck:

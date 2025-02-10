@@ -21,7 +21,7 @@ def unflatten_dict(d: Dict[str, str]) -> Dict[str, Any]:
             if part not in d:
                 d[part] = {}
             d = d[part]
-        d[parts[-1]] = value
+        d[parts[-1]] = correct_datatype(value)
     return unflattened_dict
 
 def flatten_dict(d: Dict[str, Any], parent_key: str ='') -> Dict[str, str]:
@@ -40,9 +40,22 @@ def is_numeric(value):
     if isinstance(value, (int, float)):
         return True
     elif isinstance(value, str):
-        return bool(re.match(r'^-?\d+(\.\d+)?$', value))
+        return bool(re.match(r'^\s*[+-]?\d+(\.\d+)?\s*$', value))
     else:
         return False
+
+def correct_datatype(value):
+    if isinstance(value, (int, float)):
+        return value
+    elif isinstance(value, str):
+        if re.match(r'^\s*[+-]?\d+\s*$', value):
+            return int(value)
+        elif re.match(r'^\s*[+-]?\d+\.\d+\s*$', value):
+            return float(value)
+        else:
+            return value
+    else:
+        raise NotImplementedError(value)
 
 def validate_mandatory_parameters(parameters: Dict[str, Any]) -> None:
     """Check if mandatory parameter APRS_Call, and Position_xxx are correctly set."""
