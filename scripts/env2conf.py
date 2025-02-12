@@ -8,7 +8,7 @@ import sys
 from typing import Dict, Any
 from dotenv import dotenv_values
 
-VALID_OGN_ENV_PREFIXES = ("ADSB_", "APRS_", "Beacon_", "DDB_", "Demodulator_", "HTTP_", "Position_", "RF_")
+VALID_OGN_ENV_PREFIXES = ("ADSB_", "APRS_", "DDB_", "Demodulator_", "HTTP_", "Position_", "RF_")
 
 def unflatten_dict(d: Dict[str, str]) -> Dict[str, Any]:
     """Unflattens a dictionary with flattened keys."""
