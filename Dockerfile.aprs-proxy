@@ -11,6 +11,6 @@ COPY ./scripts/incoming.py .
 COPY ./scripts/outgoing.py .
 
 ENTRYPOINT ["socat"]
-CMD ["TCP-LISTEN:14580,fork,reuseaddr", "SYSTEM:'python outgoing.py | socat - \"TCP:aprs.glidernet.org:14580\" | python incoming.py'"]
+CMD ["TCP:aprs.glidernet.org:14580", "SYSTEM:'python incoming.py | socat TCP-LISTEN:14580,fork,reuseaddr - | python outgoing.py'"]
 
 EXPOSE 14580
