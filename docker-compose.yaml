@@ -7,7 +7,7 @@ services:
       - .env
     environment:
       Demodulator_PipeName: ogn-rf:50010
-      APRS_Server: "aprs-proxy:14580"
+#      APRS_Server: "aprs-proxy:14580"
     volumes:
       - shared_data:/shared_data
     healthcheck:
@@ -55,17 +55,17 @@ services:
     tty: true
     stdin_open: true
 
-  aprs-proxy:
-    image: aprs-proxy
-    container_name: aprs-proxy
-    restart: unless-stopped
-    depends_on:
-      ogn-configuration:
-        condition: service_healthy
-    expose:
-      - 14580
-    networks:
-      - receiver
+#  aprs-proxy:
+#    image: aprs-proxy
+#    container_name: aprs-proxy
+#    restart: unless-stopped
+#    depends_on:
+#      ogn-configuration:
+#        condition: service_healthy
+#    expose:
+#      - 14580
+#    networks:
+#      - receiver
 
 networks:
   receiver:
